@@ -1,0 +1,123 @@
+q2(A)
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <time.h>
+
+#define PORT 8080
+
+int generateRandomNumber(int min, int max)
+{
+    return (rand() % (max - min + 1)) + min;
+}
+
+int main()
+{
+    int serverSocket, newSocket, clientAddressLength;
+    struct sockaddr_in serverAddress, clientAddress;
+    int randomNumber;
+    
+    // Create socket
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket == -1) {
+        perror("Socket creation failed");
+        exit(1);
+    }
+    
+ 
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(PORT);
+    
+   
+    if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
+        perror("Bind failed");
+        exit(1);
+    }
+    
+   
+    if (listen(serverSocket, 3) < 0) {
+        perror("Listen failed");
+        exit(1);
+    }
+    
+    printf("Server listening on port %d\n", PORT);
+    
+    clientAddressLength = sizeof(clientAddress);
+    
+    
+    newSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, (socklen_t *)&clientAddressLength);
+    if (newSocket < 0) {
+        perror("Accept failed");
+        exit(1);
+    }
+    
+    
+    srand(time(NULL));
+    randomNumber = generateRandomNumber(50000, 80000);
+    
+   
+    send(newSocket, &randomNumber, sizeof(randomNumber), 0);
+    
+    printf("Random number %d sent to the client\n", randomNumber);
+    
+    
+    close(newSocket);
+    close(serverSocket);
+    
+    return 0;
+}
+
+(B)
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+
+#define PORT 8080
+
+int main()
+{
+    int clientSocket;
+    struct sockaddr_in serverAddress;
+    int randomNumber;
+    
+    
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (clientSocket == -1) {
+        perror("Socket creation failed");
+        exit(1);
+    }
+    
+  
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_port = htons(PORT);
+    
+    if (inet_pton(AF_INET, "127.0.0.1", &(serverAddress.sin_addr)) <= 0) {
+        perror("Invalid address");
+        exit(1);
+    }
+    
+   
+    if (connect(clientSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
+        perror("Connection failed");
+        exit(1);
+    }
+  
+    recv(clientSocket, &randomNumber, sizeof(randomNumber), 0);
+    
+    printf("Received random number: %d\n", randomNumber);
+    
+   
+    close(clientSocket);
+    
+    return 0;
+}

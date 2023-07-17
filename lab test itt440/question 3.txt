@@ -1,0 +1,59 @@
+Q3(A)
+import socket
+
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def main():
+    server_ip = "127.0.0.1"
+    server_port = 12345
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    server_socket.bind((server_ip, server_port))
+    print(f"Server listening on {server_ip}:{server_port}")
+
+    while True:
+        data, client_address = server_socket.recvfrom(1024)
+        number = int(data.decode())
+
+        result = is_prime(number)
+
+        server_socket.sendto(str(result).encode(), client_address)
+
+if __name__ == "__main__":
+    main()
+(B)
+import socket
+
+def main():
+    server_ip = "127.0.0.1"
+    server_port = 12345
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    while True:
+        number = int(input("Enter a number (or -1 to exit): "))
+
+        if number == -1:
+            break
+
+        client_socket.sendto(str(number).encode(), (server_ip, server_port))
+
+        data, server_address = client_socket.recvfrom(1024)
+        result = bool(int(data.decode()))
+
+        if result:
+            print(f"{number} is prime.")
+        else:
+            print(f"{number} is not prime.")
+
+    client_socket.close()
+
+if __name__ == "__main__":
+    main()

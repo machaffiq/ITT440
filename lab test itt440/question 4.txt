@@ -1,0 +1,93 @@
+Fibonacci:
+nterms = int(input("How many terms? "))
+
+n1, n2 = 0, 1
+count = 0
+
+if nterms <= 0:
+   print("Please enter a positive integer")
+
+elif nterms == 1:
+   print("Fibonacci sequence upto",nterms,":")
+   print(n1)
+
+else:
+   print("Fibonacci sequence:")
+   while count < nterms:
+       print(n1)
+       nth = n1 + n2
+       
+       n1 = n2
+       n2 = nth
+       count += 1
+
+Square:
+import threading
+
+class SquareThread(threading.Thread):
+    def __init__(self, start, end):
+        super().__init__()
+        self.start = start
+        self.end = end
+
+    def run(self):
+        for i in range(self.start, self.end + 1):
+            square = i * i
+            print(f"Square of {i}: {square}")
+
+
+def main():
+    num_threads = 10
+    numbers_per_thread = 1000
+
+    # Create and start threads
+    threads = []
+    for i in range(num_threads):
+        start = i * numbers_per_thread + 1
+        end = (i + 1) * numbers_per_thread
+        thread = SquareThread(start, end)
+        threads.append(thread)
+        thread.start()
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+
+
+if __name__ == "__main__":
+    main()
+Cube:
+import threading
+
+class CubeThread(threading.Thread):
+    def __init__(self, start, end):
+        super().__init__()
+        self.start = start
+        self.end = end
+
+    def run(self):
+        for i in range(self.start, self.end + 1):
+            cube = i * i * i
+            print(f"Cube of {i}: {cube}")
+
+
+def main():
+    num_threads = 10
+    numbers_per_thread = 1000
+
+    # Create and start threads
+    threads = []
+    for i in range(num_threads):
+        start = i * numbers_per_thread + 1
+        end = (i + 1) * numbers_per_thread
+        thread = CubeThread(start, end)
+        threads.append(thread)
+        thread.start()
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+
+
+if __name__ == "__main__":
+    main()
